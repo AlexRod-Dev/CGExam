@@ -21,10 +21,13 @@ struct SpriteAnimation {
 	float elapsedTime;
 	float width;
 	float height;
+	float x;  // X position on the screen
+	float y;  // Y position on the screen
 
-	SpriteAnimation(GLuint texID, int r, int c, float duration, float frameWidth, float frameHeight)
+	SpriteAnimation(GLuint texID, int r, int c, float duration, float frameWidth, float frameHeight, float posX, float posY)
 		: textureID(texID), rows(r), columns(c), frameCount(r* c), currentFrame(0),
-		frameDuration(duration), elapsedTime(0.0f), width(frameWidth), height(frameHeight) {}
+		frameDuration(duration), elapsedTime(0.0f), width(frameWidth), height(frameHeight),
+		x(posX), y(posY) {}
 };
 
 // Vertex Shader source
@@ -122,14 +125,12 @@ void updateSpriteAnimation(SpriteAnimation& animation, float deltaTime, float* v
 	vertices[10] = frameU + uSize;  vertices[11] = frameV + vSize;  // Top-Right
 	vertices[14] = frameU;          vertices[15] = frameV + vSize;  // Top-Left
 
-	std::cout << "Current Frame: " << animation.currentFrame
+	/*std::cout << "Current Frame: " << animation.currentFrame
 		<< " | Row: " << frameRow
 		<< " | Column: " << frameCol
 		<< " | U: " << frameU
-		<< " | V: " << frameV << std::endl;
+		<< " | V: " << frameV << std::endl;*/
 }
-
-
 
 
 
@@ -155,8 +156,6 @@ int main(int argc, char* args[]) {
 		SDL_Quit();
 		return 1;
 	}
-
-
 
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
@@ -219,20 +218,29 @@ int main(int argc, char* args[]) {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+	// Load two different spritesheets
 	glm::vec3 colorKey(255, 0, 255);
-	GLuint spriteSheetTexture = loadTexture("../Assets/graphics/LonerA.bmp", colorKey, true);
+	GLuint spriteSheetTexture1 = loadTexture("../Assets/graphics/LonerA.bmp", colorKey, true);
+	GLuint spriteSheetTexture2 = loadTexture("../Assets/graphics/MAster96.bmp", colorKey, true);
+	GLuint spriteSheetTexture3 = loadTexture("../Assets/graphics/rusher.bmp", colorKey, true);
 
-	SpriteAnimation shipAnimation(spriteSheetTexture, 4, 4, 0.1f, 64.0f, 64.0f);
+	// Example of two animations with different positions
+	SpriteAnimation loner1(spriteSheetTexture1, 4, 4, 0.1f, 64.0f, 64.0f, -350.0f, 200.0f);  // Texture, rows, columns, animation speed, width, height, pos.x, pos.y
+	SpriteAnimation asteroid1(spriteSheetTexture2, 5, 5, 0.1f, 64.0f, 64.0f, 150.0f, 150.0f); 
+	SpriteAnimation rusher1(spriteSheetTexture3, 6, 4, 0.1f, 64.0f, 64.0f, 0.0f, 0.0f); 
+
+	// Store animations in a vector
+	std::vector<SpriteAnimation> animations;
+	animations.push_back(loner1);
+	animations.push_back(asteroid1);
+	animations.push_back(rusher1);
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); // Enable wireframe mode
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); // Use this to return to normal mode
-
-
-
 	float lastFrameTime = 0.0f;
+
+	// Main render loop
 	while (true) {
 		float currentFrameTime = SDL_GetTicks() / 1000.0f;
 		float deltaTime = currentFrameTime - lastFrameTime;
@@ -245,16 +253,7 @@ int main(int argc, char* args[]) {
 			}
 		}
 
-		// Update animation and vertices (texture coordinates)
-		updateSpriteAnimation(shipAnimation, deltaTime, vertices);
-
-
-
-		// Bind the VBO and update the entire vertex data
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		// Render the frame
+		// Clear the screen
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
@@ -265,18 +264,38 @@ int main(int argc, char* args[]) {
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projection));
 
-		glm::mat4 modelShip = glm::translate(glm::mat4(1.0f), glm::vec3(-350.0f, 0.0f, 0.0f));
-		modelShip = glm::scale(modelShip, glm::vec3(shipAnimation.width, shipAnimation.height, 1.0f));
-		glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(modelShip));
+		// Loop through all animations
+		for (size_t i = 0; i < animations.size(); ++i) {
+			SpriteAnimation& anim = animations[i];
 
-		glBindVertexArray(VAO);
-		glBindTexture(GL_TEXTURE_2D, shipAnimation.textureID);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			// Update animation and vertices (texture coordinates)
+			updateSpriteAnimation(anim, deltaTime, vertices);
+
+			// Update vertex buffer with new texture coordinates
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+			// Set model transformation matrix using the sprite's specific x and y positions
+			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(anim.x, anim.y, 0.0f));
+			model = glm::scale(model, glm::vec3(anim.width, anim.height, 1.0f));
+			glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+			// Bind the appropriate texture for the animation
+			glBindTexture(GL_TEXTURE_2D, anim.textureID);
+
+			// Render the sprite
+			glBindVertexArray(VAO);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		}
 
 		SDL_GL_SwapWindow(window);
 	}
 
-	glDeleteTextures(1, &spriteSheetTexture);
+	// Cleanup resources
+	for (const SpriteAnimation& anim : animations) {
+		glDeleteTextures(1, &anim.textureID);
+	}
+
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
