@@ -241,34 +241,80 @@ int main(int argc, char* args[]) {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
+#pragma region LoadTextures
 	// Load textures
 	glm::vec3 colorKey(255, 0, 255);
 	GLuint backgroundTexture = loadTexture("../Assets/graphics/galaxy2.bmp", colorKey, false);
+
+	GLuint bgRockL = loadTexture("../Assets/graphics/BlocksB.bmp", colorKey, true);
+	GLuint bgRockR = loadTexture("../Assets/graphics/BlocksA.bmp", colorKey, true);
+
 	GLuint loner = loadTexture("../Assets/graphics/LonerA.bmp", colorKey, true);
+	GLuint drone = loadTexture("../Assets/graphics/drone.bmp", colorKey, true);
+	GLuint rusher = loadTexture("../Assets/graphics/rusher.bmp", colorKey, true);
+
 	GLuint steelAsteroid = loadTexture("../Assets/graphics/MAster96.bmp", colorKey, true);
 	GLuint rockAsteroid = loadTexture("../Assets/graphics/SAster96.bmp", colorKey, true);
+	
 	GLuint ship = loadTexture("../Assets/graphics/ShipIdle.bmp", colorKey, true);
-	GLuint clone = loadTexture("../Assets/graphics/cloneA.bmp", colorKey, true);
-	GLuint shipJet = loadTexture("../Assets/graphics/playerjet.bmp", colorKey, true);
+	GLuint clone = loadTexture("../Assets/graphics/clone.bmp", colorKey, true);
+	GLuint shipJet = loadTexture("../Assets/graphics/Burner1.bmp", colorKey, true);
+	GLuint missile = loadTexture("../Assets/graphics/missileA.bmp", colorKey, true);
+	GLuint missile2 = loadTexture("../Assets/graphics/missileB.bmp", colorKey, true);
 
+	GLuint life = loadTexture("../Assets/graphics/PULife.bmp", colorKey, true);
+
+
+
+#pragma endregion
+
+#pragma region CreateAnimations
 	// Create animations
-	SpriteAnimation lonerAnim(loner, 4, 4, 0.1f, 64.0f, 64.0f, -300.0f, 200.0f); // Texture, rows, column, anim Speed, width, height, pos.x , pos.y //
-	SpriteAnimation lonerAnim2(loner, 4, 4, 0.1f, 64.0f, 64.0f, -240.0f, 200.0f); 
-	SpriteAnimation lonerAnim3(loner, 4, 4, 0.1f, 64.0f, 64.0f, -180.f, 200.0f); 
+	SpriteAnimation bgRockAnim(bgRockL, 1, 1, 1.f, 1024.0f, 1024.0f, -150.0f, -290.0f);
+	SpriteAnimation bgRockAnim2(bgRockR, 1, 1, 1.f, 1024.0f, 1024.0f, 500.0f, -500.0f);
+
+	SpriteAnimation lonerAnim(loner, 4, 4, 0.1f, 64.0f, 64.0f, 0.0f, 150.0f); 
+	SpriteAnimation lonerAnim2(loner, 4, 4, 0.1f, 64.0f, 64.0f, -60.f, 200.0f); 
+
+	SpriteAnimation droneAnim(drone, 2, 8, 0.1f, 32.0f, 32.0f, 200.f, -120.0f);
+	SpriteAnimation droneAnim2(drone, 2, 8, 0.1f, 32.0f, 32.0f, 240.f, -100.0f);
+	SpriteAnimation droneAnim3(drone, 2, 8, 0.1f, 32.0f, 32.0f, 280.f, -120.0f);
+
+
+	SpriteAnimation rusherAnim(rusher, 6, 4, 0.1f, 32.0f, 32.0f, -350.f, 200.0f);
+	SpriteAnimation rusherAnim2(rusher, 6, 4, 0.1f, 32.0f, 32.0f, -310.f, 170.0f);
+	SpriteAnimation rusherAnim3(rusher, 6, 4, 0.1f, 32.0f, 32.0f, -350.f, 140.0f);
+	SpriteAnimation rusherAnim4(rusher, 6, 4, 0.1f, 32.0f, 32.0f, -310.f, 110.0f);
+	SpriteAnimation rusherAnim5(rusher, 6, 4, 0.1f, 32.0f, 32.0f, -350.f, 80.0f);
+	SpriteAnimation rusherAnim6(rusher, 6, 4, 0.1f, 32.0f, 32.0f, -310.f, 50.0f);
 
 	SpriteAnimation sAsteroidAnim(steelAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 150.0f, 50.0f);
-	SpriteAnimation sAsteroidAnim2(steelAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 100.0f, 50.0f);
+	SpriteAnimation sAsteroidAnim2(steelAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, -150.0f, 0.0f);
 	SpriteAnimation rAsteroidAnim(rockAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 200.0f, 150.0f);
-	SpriteAnimation rAsteroidAnim2(rockAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 250.0f, 150.0f);
+	SpriteAnimation rAsteroidAnim2(rockAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 250.0f, 250.0f);
+	
+	SpriteAnimation cloneAnim(clone, 4, 4, 0.1f, 32.0f, 32.0f, -50.0f, -200.0f);
+	SpriteAnimation cloneAnim2(clone, 4, 4, 0.1f, 32.0f, 32.0f, 100.0f, -200.0f);
+	SpriteAnimation shipAnim(ship, 1, 1, 1.f, 64.0f, 64.0f, 0.0f, -230.0f);
+	SpriteAnimation shipJetAnim(shipJet, 1, 1, 1.f, 12.0f, 12.0f, -10.0f, -268.0f);
+	SpriteAnimation shipJetAnim2(shipJet, 1, 1, 1.f, 12.0f, 12.0f, 10.0f, -268.0f);
 
-	SpriteAnimation rCloneAnim(clone, 1, 1, 1.f, 128.0f, 128.0f, 10.0f, -230.0f);
-	SpriteAnimation rCloneAnim2(clone, 1, 1, 1.f, 128.0f, 128.0f, 85.0f, -230.0f);
-	SpriteAnimation rShipAnim(ship, 1, 1, 1.f, 64.0f, 64.0f, 0.0f, -230.0f);
-	SpriteAnimation rShipJetAnim(shipJet, 1, 1, 1.f, 12.0f, 12.0f, -10.0f, -268.0f);
-	SpriteAnimation rShipJetAnim2(shipJet, 1, 1, 1.f, 12.0f, 12.0f, 10.0f, -268.0f);
+	SpriteAnimation missileAnim(missile, 1, 1, 0.1f, 65.0f, 64.0f, -35.0f, -150.0f);
+	SpriteAnimation missileAnim2(missile, 1, 1, 0.1f, 65.0f, 64.0f, 65.0f, -150.0f);
+	SpriteAnimation missileAnim3(missile2, 1, 1, 0.1f, 65.0f, 64.0f, 15.0f, -180.0f);
 
-	std::vector<SpriteAnimation> animations = { lonerAnim, lonerAnim2, lonerAnim3, sAsteroidAnim, sAsteroidAnim2, rAsteroidAnim, rAsteroidAnim2, rShipAnim,
-												rShipJetAnim, rShipJetAnim2, rCloneAnim, rCloneAnim2 };
+
+	SpriteAnimation lifeAnim(life, 1, 1, 1.f, 32.0f, 32.0f, -380.0f, -280.0f);
+	SpriteAnimation lifeAnim2(life, 1, 1, 1.f, 32.0f, 32.0f, -340.0f, -280.0f);
+	SpriteAnimation lifeAnim3(life, 1, 1, 1.f, 32.0f, 32.0f, -300.0f, -280.0f);
+
+#pragma endregion 
+
+	
+	//load struct vector with the animations
+	std::vector<SpriteAnimation> animations = { bgRockAnim, bgRockAnim2, lonerAnim, lonerAnim2, droneAnim, droneAnim2, droneAnim3,rusherAnim, rusherAnim2, rusherAnim3,
+												rusherAnim4, rusherAnim5, rusherAnim6, sAsteroidAnim, sAsteroidAnim2, rAsteroidAnim, rAsteroidAnim2, shipAnim, shipJetAnim, shipJetAnim2, cloneAnim,
+												cloneAnim2, missileAnim, missileAnim2, missileAnim3, lifeAnim, lifeAnim2, lifeAnim3 };
 
 	// Projection and view matrices
 	glm::mat4 projection = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f);
@@ -311,7 +357,7 @@ int main(int argc, char* args[]) {
 
 			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(anim.x, anim.y, 0.0f));
 			model = glm::scale(model, glm::vec3(anim.width, anim.height, 1.0f));
-
+		
 
 			renderObject(VAO, anim.textureID, model, shaderProgram, view, projection);
 		}
