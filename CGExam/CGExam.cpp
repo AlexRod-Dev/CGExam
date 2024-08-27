@@ -244,14 +244,31 @@ int main(int argc, char* args[]) {
 	// Load textures
 	glm::vec3 colorKey(255, 0, 255);
 	GLuint backgroundTexture = loadTexture("../Assets/graphics/galaxy2.bmp", colorKey, false);
-	GLuint spriteSheetTexture1 = loadTexture("../Assets/graphics/LonerA.bmp", colorKey, true);
-	GLuint spriteSheetTexture2 = loadTexture("../Assets/graphics/MAster96.bmp", colorKey, true);
+	GLuint loner = loadTexture("../Assets/graphics/LonerA.bmp", colorKey, true);
+	GLuint steelAsteroid = loadTexture("../Assets/graphics/MAster96.bmp", colorKey, true);
+	GLuint rockAsteroid = loadTexture("../Assets/graphics/SAster96.bmp", colorKey, true);
+	GLuint ship = loadTexture("../Assets/graphics/ShipIdle.bmp", colorKey, true);
+	GLuint clone = loadTexture("../Assets/graphics/cloneA.bmp", colorKey, true);
+	GLuint shipJet = loadTexture("../Assets/graphics/playerjet.bmp", colorKey, true);
 
-	// Create animations and background
-	SpriteAnimation shipAnimation(spriteSheetTexture1, 4, 4, 0.1f, 64.0f, 64.0f, -350.0f, 0.0f);
-	SpriteAnimation otherAnimation(spriteSheetTexture2, 5, 5, 0.2f, 64.0f, 64.0f, 150.0f, -100.0f);
+	// Create animations
+	SpriteAnimation lonerAnim(loner, 4, 4, 0.1f, 64.0f, 64.0f, -300.0f, 200.0f); // Texture, rows, column, anim Speed, width, height, pos.x , pos.y //
+	SpriteAnimation lonerAnim2(loner, 4, 4, 0.1f, 64.0f, 64.0f, -240.0f, 200.0f); 
+	SpriteAnimation lonerAnim3(loner, 4, 4, 0.1f, 64.0f, 64.0f, -180.f, 200.0f); 
 
-	std::vector<SpriteAnimation> animations = { shipAnimation, otherAnimation };
+	SpriteAnimation sAsteroidAnim(steelAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 150.0f, 50.0f);
+	SpriteAnimation sAsteroidAnim2(steelAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 100.0f, 50.0f);
+	SpriteAnimation rAsteroidAnim(rockAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 200.0f, 150.0f);
+	SpriteAnimation rAsteroidAnim2(rockAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 250.0f, 150.0f);
+
+	SpriteAnimation rCloneAnim(clone, 1, 1, 1.f, 128.0f, 128.0f, 10.0f, -230.0f);
+	SpriteAnimation rCloneAnim2(clone, 1, 1, 1.f, 128.0f, 128.0f, 85.0f, -230.0f);
+	SpriteAnimation rShipAnim(ship, 1, 1, 1.f, 64.0f, 64.0f, 0.0f, -230.0f);
+	SpriteAnimation rShipJetAnim(shipJet, 1, 1, 1.f, 12.0f, 12.0f, -10.0f, -268.0f);
+	SpriteAnimation rShipJetAnim2(shipJet, 1, 1, 1.f, 12.0f, 12.0f, 10.0f, -268.0f);
+
+	std::vector<SpriteAnimation> animations = { lonerAnim, lonerAnim2, lonerAnim3, sAsteroidAnim, sAsteroidAnim2, rAsteroidAnim, rAsteroidAnim2, rShipAnim,
+												rShipJetAnim, rShipJetAnim2, rCloneAnim, rCloneAnim2 };
 
 	// Projection and view matrices
 	glm::mat4 projection = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f);
@@ -259,6 +276,7 @@ int main(int argc, char* args[]) {
 
 	// Background model matrix
 	glm::mat4 backgroundModel = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 0.0f));
+
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -281,6 +299,8 @@ int main(int argc, char* args[]) {
 		// Render static background (only once, no VBO updates)
 		renderObject(backgroundVAO, backgroundTexture, backgroundModel, shaderProgram, view, projection);
 
+		//renderObject(backgroundVAO, ship1, shipModel, shaderProgram, view, projection);
+
 		// Render animations
 		for (auto& anim : animations) {
 			updateSpriteAnimation(anim, deltaTime);
@@ -291,6 +311,7 @@ int main(int argc, char* args[]) {
 
 			glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(anim.x, anim.y, 0.0f));
 			model = glm::scale(model, glm::vec3(anim.width, anim.height, 1.0f));
+
 
 			renderObject(VAO, anim.textureID, model, shaderProgram, view, projection);
 		}
