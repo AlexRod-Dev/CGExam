@@ -250,11 +250,14 @@ int main(int argc, char* args[]) {
 	GLuint bgRockR = loadTexture("../Assets/graphics/BlocksA.bmp", colorKey, true);
 
 	GLuint loner = loadTexture("../Assets/graphics/LonerA.bmp", colorKey, true);
+	GLuint loner2 = loadTexture("../Assets/graphics/LonerC.bmp", colorKey, true);
 	GLuint drone = loadTexture("../Assets/graphics/drone.bmp", colorKey, true);
 	GLuint rusher = loadTexture("../Assets/graphics/rusher.bmp", colorKey, true);
 
 	GLuint steelAsteroid = loadTexture("../Assets/graphics/MAster96.bmp", colorKey, true);
+	GLuint steelAsteroid2 = loadTexture("../Assets/graphics/MAster64.bmp", colorKey, true);
 	GLuint rockAsteroid = loadTexture("../Assets/graphics/SAster96.bmp", colorKey, true);
+	GLuint rockAsteroid2 = loadTexture("../Assets/graphics/GAster96.bmp", colorKey, true);
 	
 	GLuint ship = loadTexture("../Assets/graphics/ShipIdle.bmp", colorKey, true);
 	GLuint clone = loadTexture("../Assets/graphics/clone.bmp", colorKey, true);
@@ -275,10 +278,14 @@ int main(int argc, char* args[]) {
 
 	SpriteAnimation lonerAnim(loner, 4, 4, 0.1f, 64.0f, 64.0f, 0.0f, 150.0f); 
 	SpriteAnimation lonerAnim2(loner, 4, 4, 0.1f, 64.0f, 64.0f, -60.f, 200.0f); 
+	SpriteAnimation lonerAnim3(loner, 4, 4, 0.1f, 64.0f, 64.0f, 60.f, 200.0f); 
+	SpriteAnimation lonerAnim4(loner2, 4, 4, 0.1f, 64.0f, 64.0f, -190.f, -100.0f); 
+
 
 	SpriteAnimation droneAnim(drone, 2, 8, 0.1f, 32.0f, 32.0f, 200.f, -120.0f);
 	SpriteAnimation droneAnim2(drone, 2, 8, 0.1f, 32.0f, 32.0f, 240.f, -100.0f);
 	SpriteAnimation droneAnim3(drone, 2, 8, 0.1f, 32.0f, 32.0f, 280.f, -120.0f);
+	SpriteAnimation droneAnim4(drone, 2, 8, 0.1f, 32.0f, 32.0f, 240.f, -140.0f);
 
 
 	SpriteAnimation rusherAnim(rusher, 6, 4, 0.1f, 32.0f, 32.0f, -350.f, 200.0f);
@@ -289,19 +296,23 @@ int main(int argc, char* args[]) {
 	SpriteAnimation rusherAnim6(rusher, 6, 4, 0.1f, 32.0f, 32.0f, -310.f, 50.0f);
 
 	SpriteAnimation sAsteroidAnim(steelAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 150.0f, 50.0f);
-	SpriteAnimation sAsteroidAnim2(steelAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, -150.0f, 0.0f);
+	SpriteAnimation sAsteroidAnim2(steelAsteroid2, 3, 8, 0.2f, 64.0f, 64.0f, 300.0f, 100.0f);
+
 	SpriteAnimation rAsteroidAnim(rockAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 200.0f, 150.0f);
-	SpriteAnimation rAsteroidAnim2(rockAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 250.0f, 250.0f);
+	SpriteAnimation rAsteroidAnim2(rockAsteroid, 5, 5, 0.2f, 64.0f, 64.0f, 300.0f, 220.0f);
+	SpriteAnimation rAsteroidAnim3(rockAsteroid2, 5, 5, 0.2f, 64.0f, 64.0f, -100.0f, 25.0f);
 	
 	SpriteAnimation cloneAnim(clone, 4, 4, 0.1f, 32.0f, 32.0f, -50.0f, -200.0f);
-	SpriteAnimation cloneAnim2(clone, 4, 4, 0.1f, 32.0f, 32.0f, 100.0f, -200.0f);
+	SpriteAnimation cloneAnim2(clone, 4, 4, 0.1f, 32.0f, 32.0f, 50.0f, -200.0f);
+
 	SpriteAnimation shipAnim(ship, 1, 1, 1.f, 64.0f, 64.0f, 0.0f, -230.0f);
+
 	SpriteAnimation shipJetAnim(shipJet, 1, 1, 1.f, 12.0f, 12.0f, -10.0f, -268.0f);
 	SpriteAnimation shipJetAnim2(shipJet, 1, 1, 1.f, 12.0f, 12.0f, 10.0f, -268.0f);
 
 	SpriteAnimation missileAnim(missile, 1, 1, 0.1f, 65.0f, 64.0f, -35.0f, -150.0f);
 	SpriteAnimation missileAnim2(missile, 1, 1, 0.1f, 65.0f, 64.0f, 65.0f, -150.0f);
-	SpriteAnimation missileAnim3(missile2, 1, 1, 0.1f, 65.0f, 64.0f, 15.0f, -180.0f);
+	SpriteAnimation missileAnim3(missile2, 1, 1, 0.1f, 65.0f, 64.0f, 17.0f, -180.0f);
 
 
 	SpriteAnimation lifeAnim(life, 1, 1, 1.f, 32.0f, 32.0f, -380.0f, -280.0f);
@@ -312,9 +323,10 @@ int main(int argc, char* args[]) {
 
 	
 	//load struct vector with the animations
-	std::vector<SpriteAnimation> animations = { bgRockAnim, bgRockAnim2, lonerAnim, lonerAnim2, droneAnim, droneAnim2, droneAnim3,rusherAnim, rusherAnim2, rusherAnim3,
-												rusherAnim4, rusherAnim5, rusherAnim6, sAsteroidAnim, sAsteroidAnim2, rAsteroidAnim, rAsteroidAnim2, shipAnim, shipJetAnim, shipJetAnim2, cloneAnim,
-												cloneAnim2, missileAnim, missileAnim2, missileAnim3, lifeAnim, lifeAnim2, lifeAnim3 };
+	std::vector<SpriteAnimation> animations = { bgRockAnim, bgRockAnim2, lonerAnim, lonerAnim2, lonerAnim3, lonerAnim4, droneAnim, droneAnim2, droneAnim3, droneAnim4, rusherAnim, rusherAnim2,
+												rusherAnim3, rusherAnim4, rusherAnim5, rusherAnim6, sAsteroidAnim, sAsteroidAnim2, rAsteroidAnim, rAsteroidAnim2 ,
+												rAsteroidAnim3, shipAnim, shipJetAnim, shipJetAnim2, cloneAnim, cloneAnim2, missileAnim, missileAnim2, missileAnim3,
+												lifeAnim, lifeAnim2, lifeAnim3 };
 
 	// Projection and view matrices
 	glm::mat4 projection = glm::ortho(-400.0f, 400.0f, -300.0f, 300.0f, -1.0f, 1.0f);
