@@ -84,7 +84,7 @@ GLuint loadTexture(const char* filepath, const glm::vec3& colorKey, bool applyCo
 		std::cerr << "Failed to load texture: " << filepath << ". Reason: " << stbi_failure_reason() << std::endl;
 		return 0;
 	}
-
+	//runs all pixels to see which have pink rgb to set it transparent
 	if (applyColorKey) {
 		for (int y = 0; y < height; ++y) {
 			for (int x = 0; x < width; ++x) {
@@ -124,15 +124,19 @@ void updateSpriteAnimation(SpriteAnimation& animation, float deltaTime) {
 
 // Update texture coordinates for a sprite animation
 void updateTextureCoords(SpriteAnimation& animation, float* vertices) {
+	//Determine current frame row and column
 	int frameRow = animation.currentFrame / animation.columns;
 	int frameCol = animation.currentFrame % animation.columns;
 
+	//calculate size of each frame in text coord
 	float uSize = 1.0f / animation.columns;
 	float vSize = 1.0f / animation.rows;
 
+	//calculate the text coord of the current frame
 	float frameU = frameCol * uSize;
 	float frameV = 1.0f - ((frameRow + 1) * vSize);
 
+	//update text coord in the vertex array
 	vertices[2] = frameU;           vertices[3] = frameV;           // Bottom-Left
 	vertices[6] = frameU + uSize;   vertices[7] = frameV;           // Bottom-Right
 	vertices[10] = frameU + uSize;  vertices[11] = frameV + vSize;  // Top-Right
@@ -154,6 +158,7 @@ void renderObject(GLuint VAO, GLuint texture, const glm::mat4& model, GLuint sha
 
 // Render text using the sprite sheet
 void RenderText(GLuint shaderProgram, GLuint texture, std::string text, float x, float y, float scale, glm::vec3 color, GLuint VAO, GLuint VBO, int charWidth, int charHeight, int textureWidth, int textureHeight) {
+	//setup the shader program and texture
 	glUseProgram(shaderProgram);
 	glUniform3f(glGetUniformLocation(shaderProgram, "textColor"), color.x, color.y, color.z);
 	glActiveTexture(GL_TEXTURE0);
@@ -162,17 +167,21 @@ void RenderText(GLuint shaderProgram, GLuint texture, std::string text, float x,
 
 	glBindVertexArray(VAO);
 
+	//calculate normalized character dimensions
 	float charWidthNormalized = charWidth / (float)textureWidth;
 	float charHeightNormalized = charHeight / (float)textureHeight;
 
+	//loop through each char in the text string
 	for (char c : text) {
 		int ascii = c - 32;  // Offset to map to the correct glyph in the sprite sheet
 		int row = ascii / 8; // 8 columns per row
 		int col = ascii % 8;
 
+		//calculate txt coords for the char
 		float tx = col * charWidthNormalized;
 		float ty = 1.0f - (row + 1) * charHeightNormalized;  // Flip the texture vertically
 
+		//Define the vertex data for the char quad
 		float vertices[6][4] = {
 			{ x,                    y + charHeight * scale,   tx,                      ty + charHeightNormalized }, // Top-left
 			{ x,                    y,                        tx,                      ty },                        // Bottom-left
@@ -183,9 +192,11 @@ void RenderText(GLuint shaderProgram, GLuint texture, std::string text, float x,
 			{ x + charWidth * scale, y + charHeight * scale,   tx + charWidthNormalized,ty + charHeightNormalized }  // Top-right
 		};
 
+		//update the vertex buffer with the quad data
 		glBindBuffer(GL_ARRAY_BUFFER, VBO);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 
+		//render the quad
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
 		x += charWidth * scale;
@@ -323,13 +334,12 @@ int main(int argc, char* args[]) {
 
 	// Load font texture for text rendering
 	GLuint textTexture = loadTexture("../Assets/graphics/font16x16.bmp", colorKey, true);
-
-#pragma endregion
-
-	int textureWidth = 128;  
-	int textureHeight = 192; 
+	int txtTextureWidth = 128;
+	int txtTextureHeight = 192;
 	const int charWidth = 16;
 	const int charHeight = 16;
+
+#pragma endregion
 
 #pragma region CreateAnimations
 
@@ -420,8 +430,8 @@ int main(int argc, char* args[]) {
 		}
 
 		// Render text
-		RenderText(shaderProgram, textTexture, "Score:024801", -3.0f, 17.0f, 0.04f, glm::vec3(1.0f, 1.0f, 1.0f), textVAO, textVBO, charWidth, charHeight, textureWidth, textureHeight);
-		RenderText(shaderProgram, textTexture, "HighScore:5415480", 7.0f, 17.0f, 0.02f, glm::vec3(1.0f, 1.0f, 1.0f), textVAO, textVBO, charWidth, charHeight, textureWidth, textureHeight);
+		RenderText(shaderProgram, textTexture, "Score:024801", -3.0f, 17.0f, 0.04f, glm::vec3(1.0f, 1.0f, 1.0f), textVAO, textVBO, charWidth, charHeight, txtTextureWidth, txtTextureHeight);
+		RenderText(shaderProgram, textTexture, "HighScore:5415480", 7.0f, 17.0f, 0.02f, glm::vec3(1.0f, 1.0f, 1.0f), textVAO, textVBO, charWidth, charHeight, txtTextureWidth, txtTextureHeight);
 
 		SDL_GL_SwapWindow(window);
 	}
